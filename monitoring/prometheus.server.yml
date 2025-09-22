@@ -85,12 +85,4 @@ alerting:
         - targets:
           # - alertmanager:9093
 
-# Configuration des règles d'alerte pour le serveur
-rule_files:
-  - "server_alerts.yml"
-
-# Configuration de stockage pour le serveur
-storage:
-  tsdb:
-    retention.time: 30d
-    retention.size: 10GB
+# Configuration de rétention des données (via arguments de ligne de commande)

@@ -84,3 +84,5 @@ alerting:
     - static_configs:
         - targets:
           # - alertmanager:9093
+
+# Configuration de rétention des données (via arguments de ligne de commande)

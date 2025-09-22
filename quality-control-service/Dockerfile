@@ -17,7 +17,7 @@ WORKDIR /app
 
 # Copie des requirements et installation des dépendances Python
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --timeout 300 --retries 5 -r requirements.txt
 
 # Copie du code applicatif
 COPY app/ .

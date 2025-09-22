@@ -30,6 +30,7 @@ pytest-asyncio>=0.20.0,<1.0.0
 # Logging et monitoring
 structlog>=20.0.0,<25.0.0
 prometheus-client>=0.15.0,<1.0.0
+psutil==5.9.6
 
 # Alternative plus simple: utiliser uniquement PySpark sans Zingg pour le moment
 # Si Zingg est absolument nécessaire, nous pouvons l'installer séparément ou utiliser une version différente
