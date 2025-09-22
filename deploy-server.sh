@@ -5,6 +5,10 @@
 
 set -e
 
+# S'assurer qu'on est dans le bon répertoire (là où se trouve le script)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 # Couleurs pour les messages
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -49,6 +53,26 @@ check_prerequisites() {
         print_error "Docker Compose n'est pas installé"
         exit 1
     fi
+    
+    # Vérifier que le fichier docker-compose existe
+    if [ ! -f "$COMPOSE_FILE" ]; then
+        print_error "Fichier $COMPOSE_FILE introuvable dans le répertoire $(pwd)"
+        exit 1
+    fi
+    
+    # Vérifier que les répertoires des services existent
+    REQUIRED_DIRS=("api-dashboard-service" "nifi-service" "dbt-service" "reconciliation-service" "quality-control-service" "rca-service" "warehouse-service")
+    for dir in "${REQUIRED_DIRS[@]}"; do
+        if [ ! -d "$dir" ]; then
+            print_error "Répertoire de service manquant: $dir"
+            exit 1
+        fi
+        if [ ! -f "$dir/Dockerfile" ]; then
+            print_error "Dockerfile manquant dans: $dir"
+            exit 1
+        fi
+    done
+    print_message "Structure du projet vérifiée ✓"
     
     # Vérifier les ports disponibles
     print_message "Vérification des ports disponibles..."
@@ -143,6 +167,7 @@ show_access_urls() {
 # Fonction pour construire et démarrer
 deploy() {
     print_message "Déploiement de la plateforme SaaS..."
+    print_message "Répertoire de travail: $(pwd)"
     
     # Arrêter les services existants
     print_message "Arrêt des services existants..."
