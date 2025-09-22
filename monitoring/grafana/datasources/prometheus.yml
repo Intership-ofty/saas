@@ -1,0 +1,40 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+      queryTimeout: 60s
+    secureJsonData: {}
+    version: 1
+
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: warehouse-service:5432
+    database: data_warehouse
+    user: warehouse_user
+    isDefault: false
+    editable: true
+    jsonData:
+      sslmode: 'disable'
+      maxOpenConns: 100
+      maxIdleConns: 100
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 1500
+      timescaledb: false
+    secureJsonData:
+      password: warehouse_password
+    version: 1
