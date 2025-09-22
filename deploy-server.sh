@@ -54,9 +54,27 @@ check_prerequisites() {
     print_message "Vérification des ports disponibles..."
     PORTS=(80 10000 10001 10002 10003 10004 10080 10090 10300 10543 10637)
     for port in "${PORTS[@]}"; do
-        if netstat -tuln | grep -q ":$port "; then
-            print_warning "Port $port déjà utilisé"
+        # Essayer plusieurs méthodes pour vérifier les ports
+        if command -v ss &> /dev/null; then
+            if ss -tuln | grep -q ":$port "; then
+                print_warning "Port $port déjà utilisé"
+            else
+                print_message "Port $port disponible ✓"
+            fi
+        elif command -v lsof &> /dev/null; then
+            if lsof -i :$port &> /dev/null; then
+                print_warning "Port $port déjà utilisé"
+            else
+                print_message "Port $port disponible ✓"
+            fi
+        elif command -v netstat &> /dev/null; then
+            if netstat -tuln | grep -q ":$port "; then
+                print_warning "Port $port déjà utilisé"
+            else
+                print_message "Port $port disponible ✓"
+            fi
         else
+            # Si aucune commande n'est disponible, on suppose que le port est disponible
             print_message "Port $port disponible ✓"
         fi
     done
