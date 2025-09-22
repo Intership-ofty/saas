@@ -24,6 +24,7 @@ Cette plateforme SaaS offre une solution complète pour :
 - **Réconciliation et déduplication** avec Zingg
 - **Contrôle qualité** avec Soda
 - **Analyse des causes racines** (RCA)
+- **Streaming de données** avec Apache Kafka (mode KRaft)
 - **API REST et Dashboard** pour visualisation et monitoring
 - **Stockage historique** avec PostgreSQL
 
@@ -251,6 +252,15 @@ sequenceDiagram
   - Métriques système
   - Logs d'audit
 
+### 8. **kafka** (Port 9092) - Mode KRaft
+- **Rôle** : Streaming de données et messagerie
+- **Technologies** : Apache Kafka 7.4.0 (mode KRaft)
+- **Fonctionnalités** :
+  - Streaming de données en temps réel
+  - Messagerie asynchrone entre services
+  - Topics pour événements CDR, alertes, métriques
+  - Architecture simplifiée sans ZooKeeper
+
 ## 🚀 Installation
 
 ### Prérequis
@@ -457,6 +467,63 @@ curl -X POST "http://localhost:8003/check" \
 - **Qualité** : Scores de qualité, taux d'erreur, complétude
 - **Business** : KPI métier, volumes de données, alertes
 - **Infrastructure** : État des services, connectivité, stockage
+- **Kafka** : Débit des topics, latence, consommation, production
+
+## 🔄 Kafka Streaming (Mode KRaft)
+
+### Configuration
+
+Kafka fonctionne en mode KRaft (sans ZooKeeper) pour une architecture simplifiée :
+
+```bash
+# Démarrer Kafka
+make kafka-up
+
+# Vérifier le statut
+make kafka-test
+
+# Initialiser les topics
+make kafka-init-topics
+
+# Lister les topics
+make kafka-topics
+```
+
+### Topics Disponibles
+
+| Topic | Description | Partitions |
+|-------|-------------|------------|
+| `cdr-events` | Événements CDR | 3 |
+| `alerts` | Alertes système | 3 |
+| `metrics` | Métriques de performance | 3 |
+| `quality-events` | Événements de qualité | 3 |
+| `reconciliation-events` | Événements de réconciliation | 3 |
+| `rca-events` | Événements d'analyse RCA | 3 |
+| `dbt-events` | Événements de transformation | 3 |
+| `audit-logs` | Logs d'audit | 3 |
+
+### Utilisation
+
+```bash
+# Produire un message
+make kafka-produce TOPIC=test-topic MESSAGE="Hello Kafka"
+
+# Consommer des messages
+make kafka-consume TOPIC=test-topic
+
+# Tester la connectivité
+make kafka-test
+```
+
+### Scripts PowerShell (Windows)
+
+```powershell
+# Initialiser les topics
+.\scripts\init-kafka-topics.ps1
+
+# Tester Kafka
+.\scripts\test-kafka-kraft.ps1
+```
 
 ### Dashboards Grafana
 

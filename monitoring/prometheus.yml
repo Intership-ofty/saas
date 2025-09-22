@@ -78,6 +78,19 @@ scrape_configs:
       - targets: ['cadvisor:8080']
     scrape_interval: 30s
 
+  # Configuration pour Kafka (mode KRaft)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    # Note: Kafka JMX metrics nécessitent un JMX exporter
+    # Configuration alternative avec JMX exporter
+    # - job_name: 'kafka-jmx'
+    #   static_configs:
+    #     - targets: ['kafka-jmx-exporter:9308']
+    #   scrape_interval: 30s
+
 # Configuration des alertes
 alerting:
   alertmanagers:

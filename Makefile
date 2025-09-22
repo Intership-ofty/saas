@@ -209,6 +209,45 @@ init: ## Configuration initiale du projet
 	@mkdir -p logs uploads exports temp
 	@echo "Configuration initiale terminée!"
 
+# Kafka (mode KRaft)
+kafka-up: ## Démarrer Kafka en mode KRaft
+	@echo "$(GREEN)Démarrage de Kafka en mode KRaft...$(NC)"
+	docker-compose -f $(COMPOSE_FILE) up -d kafka
+
+kafka-down: ## Arrêter Kafka
+	@echo "$(RED)Arrêt de Kafka...$(NC)"
+	docker-compose -f $(COMPOSE_FILE) stop kafka
+
+kafka-logs: ## Afficher les logs de Kafka
+	docker-compose -f $(COMPOSE_FILE) logs -f kafka
+
+kafka-topics: ## Lister les topics Kafka
+	@echo "$(GREEN)Liste des topics Kafka:$(NC)"
+	docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list
+
+kafka-init-topics: ## Initialiser les topics Kafka
+	@echo "$(GREEN)Initialisation des topics Kafka...$(NC)"
+	@if [ -f scripts/init-kafka-topics.sh ]; then \
+		docker exec kafka /bin/bash -c "KAFKA_BOOTSTRAP_SERVER=localhost:9092 /scripts/init-kafka-topics.sh"; \
+	else \
+		echo "$(RED)Script d'initialisation non trouvé$(NC)"; \
+	fi
+
+kafka-shell: ## Ouvrir un shell dans le container Kafka
+	docker-compose -f $(COMPOSE_FILE) exec kafka /bin/bash
+
+kafka-test: ## Tester la connectivité Kafka
+	@echo "$(GREEN)Test de connectivité Kafka...$(NC)"
+	@docker exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092
+
+kafka-produce: ## Produire un message de test (usage: make kafka-produce TOPIC=test-topic MESSAGE="Hello Kafka")
+	@echo "$(GREEN)Production d'un message vers le topic $(TOPIC)...$(NC)"
+	@echo "$(MESSAGE)" | docker exec -i kafka kafka-console-producer --bootstrap-server localhost:9092 --topic $(TOPIC)
+
+kafka-consume: ## Consommer des messages (usage: make kafka-consume TOPIC=test-topic)
+	@echo "$(GREEN)Consommation des messages du topic $(TOPIC)...$(NC)"
+	docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic $(TOPIC) --from-beginning
+
 # Afficher les URLs des services
 urls: ## Afficher les URLs des services
 	@echo "$(GREEN)URLs des services:$(NC)"
@@ -222,3 +261,4 @@ urls: ## Afficher les URLs des services
 	@echo "  Recon Service: http://localhost:8002"
 	@echo "  Quality Svc:   http://localhost:8003"
 	@echo "  RCA Service:   http://localhost:8004"
+	@echo "  Kafka:         localhost:9092 (mode KRaft)"

@@ -1,0 +1,132 @@
+# Configuration JMX Exporter pour Kafka
+# Ce fichier configure les métriques JMX à exposer pour Kafka en mode KRaft
+
+rules:
+  # Métriques de base Kafka
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=MessagesInPerSec, topic=(.+)><>Count
+    name: kafka_topic_messages_in_per_sec
+    labels:
+      topic: "$1"
+    type: COUNTER
+
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=BytesInPerSec, topic=(.+)><>Count
+    name: kafka_topic_bytes_in_per_sec
+    labels:
+      topic: "$1"
+    type: COUNTER
+
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=BytesOutPerSec, topic=(.+)><>Count
+    name: kafka_topic_bytes_out_per_sec
+    labels:
+      topic: "$1"
+    type: COUNTER
+
+  # Métriques de réplication
+  - pattern: kafka.server<type=ReplicaManager, name=LeaderCount><>Value
+    name: kafka_replica_leader_count
+    type: GAUGE
+
+  - pattern: kafka.server<type=ReplicaManager, name=PartitionCount><>Value
+    name: kafka_replica_partition_count
+    type: GAUGE
+
+  # Métriques de groupe de consommateurs
+  - pattern: kafka.server<type=GroupMetadataManager, name=NumGroups><>Value
+    name: kafka_consumer_groups_count
+    type: GAUGE
+
+  # Métriques de contrôleur (mode KRaft)
+  - pattern: kafka.controller<type=KafkaController, name=ActiveControllerCount><>Value
+    name: kafka_controller_active_count
+    type: GAUGE
+
+  - pattern: kafka.controller<type=KafkaController, name=OfflinePartitionsCount><>Value
+    name: kafka_controller_offline_partitions_count
+    type: GAUGE
+
+  # Métriques de log
+  - pattern: kafka.log<type=LogFlushStats, name=LogFlushRateAndTimeMs><>Count
+    name: kafka_log_flush_rate
+    type: COUNTER
+
+  - pattern: kafka.log<type=LogFlushStats, name=LogFlushRateAndTimeMs><>Mean
+    name: kafka_log_flush_time_ms
+    type: GAUGE
+
+  # Métriques de réseau
+  - pattern: kafka.network<type=RequestMetrics, name=TotalTimeMs, request=Produce><>Count
+    name: kafka_network_produce_requests_total
+    type: COUNTER
+
+  - pattern: kafka.network<type=RequestMetrics, name=TotalTimeMs, request=Produce><>Mean
+    name: kafka_network_produce_request_time_ms
+    type: GAUGE
+
+  - pattern: kafka.network<type=RequestMetrics, name=TotalTimeMs, request=FetchConsumer><>Count
+    name: kafka_network_fetch_consumer_requests_total
+    type: COUNTER
+
+  - pattern: kafka.network<type=RequestMetrics, name=TotalTimeMs, request=FetchConsumer><>Mean
+    name: kafka_network_fetch_consumer_request_time_ms
+    type: GAUGE
+
+  # Métriques de stockage
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=Size, topic=(.+)><>Value
+    name: kafka_topic_size_bytes
+    labels:
+      topic: "$1"
+    type: GAUGE
+
+  # Métriques de mémoire
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=LogSize, topic=(.+)><>Value
+    name: kafka_topic_log_size_bytes
+    labels:
+      topic: "$1"
+    type: GAUGE
+
+  # Métriques de performance
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=MessagesInPerSec, topic=(.+)><>OneMinuteRate
+    name: kafka_topic_messages_in_rate_1min
+    labels:
+      topic: "$1"
+    type: GAUGE
+
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=BytesInPerSec, topic=(.+)><>OneMinuteRate
+    name: kafka_topic_bytes_in_rate_1min
+    labels:
+      topic: "$1"
+    type: GAUGE
+
+  # Métriques de lag de réplication
+  - pattern: kafka.server<type=ReplicaFetcherManager, name=MaxLag, clientId=(.+)><>Value
+    name: kafka_replica_fetcher_max_lag
+    labels:
+      client_id: "$1"
+    type: GAUGE
+
+  # Métriques de session
+  - pattern: kafka.server<type=SessionExpireListener, name=SessionExpiresPerSec><>Count
+    name: kafka_session_expires_total
+    type: COUNTER
+
+  # Métriques de cluster (mode KRaft)
+  - pattern: kafka.controller<type=KafkaController, name=GlobalPartitionCount><>Value
+    name: kafka_controller_global_partition_count
+    type: GAUGE
+
+  - pattern: kafka.controller<type=KafkaController, name=OfflinePartitionsCount><>Value
+    name: kafka_controller_offline_partitions_count
+    type: GAUGE
+
+  # Métriques de sécurité
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=FailedFetchRequestsPerSec, topic=(.+)><>Count
+    name: kafka_topic_failed_fetch_requests_total
+    labels:
+      topic: "$1"
+    type: COUNTER
+
+  - pattern: kafka.server<type=BrokerTopicMetrics, name=FailedProduceRequestsPerSec, topic=(.+)><>Count
+    name: kafka_topic_failed_produce_requests_total
+    labels:
+      topic: "$1"
+    type: COUNTER

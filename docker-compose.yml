@@ -24,7 +24,7 @@ services:
       - saas-network
     volumes:
       - ./api-dashboard-service/app:/app
-      - dashboard-data:/app/data
+      - ./data/dashboard:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -40,26 +40,30 @@ services:
     container_name: nifi-service
     ports:
       - "8080:8080"
-      - "8443:8443"
-      - "10005:10000"
-      - "8000:8000"
+      # - "8443:8443"
+      # - "11000:10000"
+      # - "8000:8000"
     environment:
       - NIFI_WEB_HTTP_HOST=0.0.0.0
-      - NIFI_WEB_HTTP_PORT=8080
-      - NIFI_WEB_HTTPS_HOST=0.0.0.0
-      - NIFI_WEB_HTTPS_PORT=8443
-      - NIFI_CLUSTER_IS_NODE=false
-      - NIFI_SENSITIVE_PROPS_KEY=changeme123456789012345678901234567890
+      # - NIFI_WEB_HTTP_PORT=8080
+      # - NIFI_SENSITIVE_PROPS_KEY=changeme123456789012345678901234567890
+      # - NIFI_WEB_HTTP_HOST=0.0.0.0
+      # - NIFI_WEB_HTTP_PORT=8080
+      # - NIFI_WEB_HTTPS_HOST=0.0.0.0
+      #- NIFI_WEB_HTTPS_PORT=8443
+      # - NIFI_CLUSTER_IS_NODE=false
+      # - NIFI_SENSITIVE_PROPS_KEY=changeme123456789012345678901234567890
+      # - NIFI_RUN_AS_USER=
     networks:
       - saas-network
-    volumes:
-      - nifi-conf:/opt/nifi/nifi-current/conf
-      - nifi-database:/opt/nifi/nifi-current/database_repository
-      - nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository
-      - nifi-content:/opt/nifi/nifi-current/content_repository
-      - nifi-provenance:/opt/nifi/nifi-current/provenance_repository
-      - nifi-logs:/opt/nifi/nifi-current/logs
-      - nifi-data:/data
+    # volumes:
+      # - ./nifi-service/nifi-conf:/opt/nifi/nifi-current/conf
+      # - ./data/nifi/database_repository:/opt/nifi/nifi-current/database_repository
+      # - ./data/nifi/flowfile_repository:/opt/nifi/nifi-current/flowfile_repository
+      # - ./data/nifi/content_repository:/opt/nifi/nifi-current/content_repository
+      # - ./data/nifi/provenance_repository:/opt/nifi/nifi-current/provenance_repository
+      # - ./data/nifi/logs:/opt/nifi/nifi-current/logs
+      # - ./data/minio:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/nifi/"]
@@ -85,7 +89,7 @@ services:
       - saas-network
     volumes:
       - ./dbt-service/app:/app
-      - dbt-data:/app/data
+      - ./data/dbt:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
@@ -113,8 +117,8 @@ services:
       - saas-network
     volumes:
       - ./reconciliation-service/app:/app
-      - zingg-workspace:/tmp/zingg_workspace
-      - zingg-models:/tmp/zingg_models
+      - ./data/zingg_workspace:/tmp/zingg_workspace
+      - ./data/zingg_models:/tmp/zingg_models
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
@@ -142,8 +146,8 @@ services:
       - saas-network
     volumes:
       - ./quality-control-service/app:/app
-      - soda-config:/app/soda_config
-      - soda-checks:/app/soda_checks
+      - ./data/soda_config:/app/soda_config
+      - ./data/soda_checks:/app/soda_checks
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
@@ -169,7 +173,7 @@ services:
       - saas-network
     volumes:
       - ./rca-service/app:/app
-      - rca-data:/app/data
+      - ./data/rca:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
@@ -193,7 +197,7 @@ services:
     networks:
       - saas-network
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
       - ./warehouse-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     restart: unless-stopped
     healthcheck:
@@ -212,7 +216,7 @@ services:
     networks:
       - saas-network
     volumes:
-      - redis-data:/data
+      - ./data/redis:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -245,7 +249,7 @@ services:
       - "9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+      - ./data/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -268,7 +272,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - grafana-data:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana
       - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
@@ -277,36 +281,38 @@ services:
       - saas-network
     restart: unless-stopped
 
-  # ==================== KAFKA POUR STREAMING (OPTIONNEL) ====================
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - saas-network
-    restart: unless-stopped
-
+  # ==================== KAFKA POUR STREAMING (MODE KRAFT) ====================
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: kafka
     ports:
       - "9092:9092"
+      - "9093:9093"
     environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      # Configuration KRaft (sans ZooKeeper)
+      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_PROCESS_ROLES=broker,controller
-    depends_on:
-      - zookeeper
+      - KAFKA_LOG_RETENTION_HOURS=168
     networks:
       - saas-network
     volumes:
       - kafka-data:/var/lib/kafka/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ==================== MINIO POUR STOCKAGE OBJET (OPTIONNEL) ====================
   minio:
@@ -322,7 +328,7 @@ services:
     networks:
       - saas-network
     volumes:
-      - minio-data:/data
+      - ./data/minio:/data
     restart: unless-stopped
 
 # ==================== RÉSEAUX ====================
@@ -333,58 +339,7 @@ networks:
 #      config:
 #        - subnet: 172.20.0.0/16
 
-# ==================== VOLUMES PERSISTANTS ====================
+# ==================== VOLUMES ====================
 volumes:
-  # Volumes PostgreSQL
-  postgres-data:
-    driver: local
-  
-  # Volumes NiFi
-  nifi-conf:
-    driver: local
-  nifi-database:
-    driver: local
-  nifi-flowfile:
-    driver: local
-  nifi-content:
-    driver: local
-  nifi-provenance:
-    driver: local
-  nifi-logs:
-    driver: local
-  nifi-data:
-    driver: local
-  
-  # Volumes des services
-  dbt-data:
-    driver: local
-  zingg-workspace:
-    driver: local
-  zingg-models:
-    driver: local
-  soda-config:
-    driver: local
-  soda-checks:
-    driver: local
-  rca-data:
-    driver: local
-  dashboard-data:
-    driver: local
-  
-  # Volumes Redis
-  redis-data:
-    driver: local
-  
-  # Volumes monitoring
-  prometheus-data:
-    driver: local
-  grafana-data:
-    driver: local
-  
-  # Volumes streaming
   kafka-data:
-    driver: local
-  
-  # Volumes stockage objet
-  minio-data:
     driver: local
