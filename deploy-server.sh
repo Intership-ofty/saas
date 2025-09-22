@@ -52,7 +52,7 @@ check_prerequisites() {
     
     # Vérifier les ports disponibles
     print_message "Vérification des ports disponibles..."
-    PORTS=(80 9000 9001 9002 9003 9004 9080 9090 9300 9543 9637)
+    PORTS=(80 10000 10001 10002 10003 10004 10080 10090 10300 10543 10637)
     for port in "${PORTS[@]}"; do
         if netstat -tuln | grep -q ":$port "; then
             print_warning "Port $port déjà utilisé"
@@ -104,18 +104,18 @@ show_access_urls() {
     echo "  Prometheus:    http://$server_ip/prometheus/"
     echo ""
     echo -e "${BLUE}🔌 Accès Direct par Port:${NC}"
-    echo "  Dashboard:     http://$server_ip:9000"
-    echo "  NiFi:          http://$server_ip:9080"
-    echo "  DBT Service:   http://$server_ip:9001"
-    echo "  Réconciliation: http://$server_ip:9002"
-    echo "  Contrôle Qualité: http://$server_ip:9003"
-    echo "  RCA Service:   http://$server_ip:9004"
-    echo "  Grafana:       http://$server_ip:9300"
-    echo "  Prometheus:    http://$server_ip:9090"
+    echo "  Dashboard:     http://$server_ip:10000"
+    echo "  NiFi:          http://$server_ip:10080"
+    echo "  DBT Service:   http://$server_ip:10001"
+    echo "  Réconciliation: http://$server_ip:10002"
+    echo "  Contrôle Qualité: http://$server_ip:10003"
+    echo "  RCA Service:   http://$server_ip:10004"
+    echo "  Grafana:       http://$server_ip:10300"
+    echo "  Prometheus:    http://$server_ip:10090"
     echo ""
     echo -e "${BLUE}💾 Base de Données:${NC}"
-    echo "  PostgreSQL:    $server_ip:9543"
-    echo "  Redis:         $server_ip:9637"
+    echo "  PostgreSQL:    $server_ip:10543"
+    echo "  Redis:         $server_ip:10637"
     echo ""
     echo -e "${BLUE}ℹ️  Information Serveur:${NC}"
     echo "  Page d'info:   http://$server_ip/info"
@@ -233,23 +233,23 @@ configure_firewall() {
         print_message "Configuration UFW..."
         sudo ufw allow 80/tcp
         sudo ufw allow 443/tcp
-        sudo ufw allow 9000:9004/tcp
-        sudo ufw allow 9080/tcp
-        sudo ufw allow 9090/tcp
-        sudo ufw allow 9300/tcp
-        sudo ufw allow 9543/tcp
-        sudo ufw allow 9637/tcp
+        sudo ufw allow 10000:10004/tcp
+        sudo ufw allow 10080/tcp
+        sudo ufw allow 10090/tcp
+        sudo ufw allow 10300/tcp
+        sudo ufw allow 10543/tcp
+        sudo ufw allow 10637/tcp
         print_message "Pare-feu configuré ✓"
     elif command -v firewall-cmd &> /dev/null; then
         print_message "Configuration firewalld..."
         sudo firewall-cmd --permanent --add-port=80/tcp
         sudo firewall-cmd --permanent --add-port=443/tcp
-        sudo firewall-cmd --permanent --add-port=9000-9004/tcp
-        sudo firewall-cmd --permanent --add-port=9080/tcp
-        sudo firewall-cmd --permanent --add-port=9090/tcp
-        sudo firewall-cmd --permanent --add-port=9300/tcp
-        sudo firewall-cmd --permanent --add-port=9543/tcp
-        sudo firewall-cmd --permanent --add-port=9637/tcp
+        sudo firewall-cmd --permanent --add-port=10000-10004/tcp
+        sudo firewall-cmd --permanent --add-port=10080/tcp
+        sudo firewall-cmd --permanent --add-port=10090/tcp
+        sudo firewall-cmd --permanent --add-port=10300/tcp
+        sudo firewall-cmd --permanent --add-port=10543/tcp
+        sudo firewall-cmd --permanent --add-port=10637/tcp
         sudo firewall-cmd --reload
         print_message "Pare-feu configuré ✓"
     else

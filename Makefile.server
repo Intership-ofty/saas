@@ -167,7 +167,7 @@ update-code: ## Mettre à jour le code et redéployer
 # Vérification des ports serveur
 check-ports: ## Vérifier les ports utilisés sur le serveur
 	@echo "$(GREEN)Vérification des ports serveur:$(NC)"
-	@netstat -tulpn | grep -E ':(80|443|9000|9001|9002|9003|9004|9080|9090|9300|9543|9637)' || echo "Aucun port en conflit détecté"
+	@netstat -tulpn | grep -E ':(80|443|10000|10001|10002|10003|10004|10080|10090|10300|10543|10637)' || echo "Aucun port en conflit détecté"
 
 check-ip: ## Afficher l'IP du serveur
 	@echo "$(GREEN)IP du serveur:$(NC)"

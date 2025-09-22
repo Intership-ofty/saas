@@ -115,25 +115,25 @@ docker-compose -f docker-compose.server.yml ps
 ### URLs Principales
 | Service | URL | Port Direct |
 |---------|-----|-------------|
-| **Dashboard** | `http://[IP_SERVEUR]/dashboard/` | 9000 |
-| **API Docs** | `http://[IP_SERVEUR]/api/docs` | 9000 |
-| **NiFi** | `http://[IP_SERVEUR]/nifi/` | 9080 |
-| **Grafana** | `http://[IP_SERVEUR]/grafana/` | 9300 |
-| **Prometheus** | `http://[IP_SERVEUR]/prometheus/` | 9090 |
+| **Dashboard** | `http://[IP_SERVEUR]/dashboard/` | 10000 |
+| **API Docs** | `http://[IP_SERVEUR]/api/docs` | 10000 |
+| **NiFi** | `http://[IP_SERVEUR]/nifi/` | 10080 |
+| **Grafana** | `http://[IP_SERVEUR]/grafana/` | 10300 |
+| **Prometheus** | `http://[IP_SERVEUR]/prometheus/` | 10090 |
 
 ### Services de Traitement
 | Service | Port | Description |
 |---------|------|-------------|
-| DBT Service | 9001 | Transformation de données |
-| Réconciliation | 9002 | Matching et déduplication |
-| Contrôle Qualité | 9003 | Validation et anomalies |
-| RCA Service | 9004 | Analyse des causes racines |
+| DBT Service | 10001 | Transformation de données |
+| Réconciliation | 10002 | Matching et déduplication |
+| Contrôle Qualité | 10003 | Validation et anomalies |
+| RCA Service | 10004 | Analyse des causes racines |
 
 ### Base de Données
 | Service | Port | Description |
 |---------|------|-------------|
-| PostgreSQL | 9543 | Data warehouse |
-| Redis | 9637 | Cache et sessions |
+| PostgreSQL | 10543 | Data warehouse |
+| Redis | 10637 | Cache et sessions |
 
 ## 🔒 Configuration Sécurisée
 
@@ -145,12 +145,12 @@ sudo ufw enable
 # Ouvrir les ports nécessaires
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
-sudo ufw allow 9000:9004/tcp
-sudo ufw allow 9080/tcp
-sudo ufw allow 9090/tcp
-sudo ufw allow 9300/tcp
-sudo ufw allow 9543/tcp
-sudo ufw allow 9637/tcp
+sudo ufw allow 10000:10004/tcp
+sudo ufw allow 10080/tcp
+sudo ufw allow 10090/tcp
+sudo ufw allow 10300/tcp
+sudo ufw allow 10543/tcp
+sudo ufw allow 10637/tcp
 
 # Vérifier le statut
 sudo ufw status
@@ -262,7 +262,7 @@ docker-compose -f docker-compose.server.yml exec [service-name] /bin/bash
 docker system prune -f
 
 # Vérification des ports
-netstat -tulpn | grep -E ':(80|9000|9001|9002|9003|9004|9080|9090|9300|9543|9637)'
+netstat -tulpn | grep -E ':(80|10000|10001|10002|10003|10004|10080|10090|10300|10543|10637)'
 ```
 
 ## 🌍 Accès Externe

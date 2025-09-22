@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Configuration pour déploiement serveur sans IP fixe
-# Utilise les ports à partir de 9000
+# Utilise les ports à partir de 10000
 
 services:
   # ==================== SERVICE PRINCIPAL API/DASHBOARD ====================
@@ -11,7 +11,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-api-dashboard
     ports:
-      - "9000:8000"  # Dashboard principal sur port 9000
+      - "10000:8000"  # Dashboard principal sur port 10000
     environment:
       - DATABASE_URL=postgresql://warehouse_user:warehouse_password@warehouse-service:5432/data_warehouse
       - NIFI_SERVICE_URL=http://nifi-service:8080
@@ -43,7 +43,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-nifi
     ports:
-      - "9080:8080"  # NiFi sur port 9080
+      - "10080:8080"  # NiFi sur port 10080
       - "9443:8443"
       - "9100:10000"
       - "9800:8000"
@@ -78,7 +78,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-dbt
     ports:
-      - "9001:8001"  # DBT service sur port 9001
+      - "10001:8001"  # DBT service sur port 10001
     environment:
       - DATABASE_URL=postgresql://warehouse_user:warehouse_password@warehouse-service:5432/data_warehouse
       - PYTHONPATH=/app
@@ -105,7 +105,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-reconciliation
     ports:
-      - "9002:8002"  # Réconciliation sur port 9002
+      - "10002:8002"  # Réconciliation sur port 10002
     environment:
       - DATABASE_URL=postgresql://warehouse_user:warehouse_password@warehouse-service:5432/data_warehouse
       - PYTHONPATH=/app
@@ -135,7 +135,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-quality-control
     ports:
-      - "9003:8003"  # Contrôle qualité sur port 9003
+      - "10003:8003"  # Contrôle qualité sur port 10003
     environment:
       - DATABASE_URL=postgresql://warehouse_user:warehouse_password@warehouse-service:5432/data_warehouse
       - PYTHONPATH=/app
@@ -165,7 +165,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-rca
     ports:
-      - "9004:8004"  # RCA sur port 9004
+      - "10004:8004"  # RCA sur port 10004
     environment:
       - DATABASE_URL=postgresql://warehouse_user:warehouse_password@warehouse-service:5432/data_warehouse
       - PYTHONPATH=/app
@@ -192,7 +192,7 @@ services:
       dockerfile: Dockerfile
     container_name: saas-warehouse
     ports:
-      - "9543:5432"  # PostgreSQL sur port 9543
+      - "10543:5432"  # PostgreSQL sur port 10543
     environment:
       - POSTGRES_DB=data_warehouse
       - POSTGRES_USER=warehouse_user
@@ -215,7 +215,7 @@ services:
     image: redis:7-alpine
     container_name: saas-redis
     ports:
-      - "9637:6379"  # Redis sur port 9637
+      - "10637:6379"  # Redis sur port 10637
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     networks:
       - saas-network
@@ -250,7 +250,7 @@ services:
     image: prom/prometheus:latest
     container_name: saas-prometheus
     ports:
-      - "9090:9090"  # Prometheus sur port 9090
+      - "10090:9090"  # Prometheus sur port 10090
     volumes:
       - ./monitoring/prometheus.server.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -269,12 +269,12 @@ services:
     image: grafana/grafana:latest
     container_name: saas-grafana
     ports:
-      - "9300:3000"  # Grafana sur port 9300
+      - "10300:3000"  # Grafana sur port 10300
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_DOMAIN=localhost
-      - GF_SERVER_ROOT_URL=http://localhost:9300/
+      - GF_SERVER_ROOT_URL=http://localhost:10300/
     volumes:
       - grafana-data:/var/lib/grafana
       - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -290,7 +290,7 @@ services:
     image: confluentinc/cp-zookeeper:latest
     container_name: saas-zookeeper
     ports:
-      - "9218:2181"  # Zookeeper sur port 9218
+      - "10218:2181"  # Zookeeper sur port 10218
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -302,12 +302,12 @@ services:
     image: confluentinc/cp-kafka:latest
     container_name: saas-kafka
     ports:
-      - "9092:9092"  # Kafka sur port 9092 (standard)
-      - "9093:9093"  # Kafka alternatif sur port 9093
+      - "10092:9092"  # Kafka sur port 10092 (standard)
+      - "10093:9093"  # Kafka alternatif sur port 10093
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:10092,PLAINTEXT_HOST://localhost:10093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
