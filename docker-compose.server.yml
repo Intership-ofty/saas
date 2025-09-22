@@ -341,9 +341,11 @@ services:
 networks:
   saas-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.25.0.0/16
+    # Configuration ipam commentée pour éviter les conflits de sous-réseau
+    # Docker choisira automatiquement un sous-réseau disponible
+    # ipam:
+    #   config:
+    #     - subnet: 172.25.0.0/16
 
 # ==================== VOLUMES PERSISTANTS ====================
 volumes:

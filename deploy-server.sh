@@ -187,7 +187,7 @@ deploy() {
     
     # Construire les images
     print_message "Construction des images Docker..."
-    docker-compose -f $COMPOSE_FILE build --no-cache
+    docker-compose -f $COMPOSE_FILE build
     
     # Démarrer les services
     print_message "Démarrage des services..."
