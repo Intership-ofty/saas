@@ -1,0 +1,96 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Configuration pour Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Configuration pour l'API Dashboard (port 9000)
+  - job_name: 'api-dashboard-service'
+    static_configs:
+      - targets: ['api-dashboard-service:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuration pour le service DBT (port 9001)
+  - job_name: 'dbt-service'
+    static_configs:
+      - targets: ['dbt-service:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuration pour le service de réconciliation (port 9002)
+  - job_name: 'reconciliation-service'
+    static_configs:
+      - targets: ['reconciliation-service:8002']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuration pour le service de contrôle qualité (port 9003)
+  - job_name: 'quality-control-service'
+    static_configs:
+      - targets: ['quality-control-service:8003']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuration pour le service RCA (port 9004)
+  - job_name: 'rca-service'
+    static_configs:
+      - targets: ['rca-service:8004']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuration pour NiFi (port 9080)
+  - job_name: 'nifi-service'
+    static_configs:
+      - targets: ['nifi-service:8080']
+    metrics_path: '/nifi-api/system-diagnostics'
+    scrape_interval: 60s
+
+  # Configuration pour PostgreSQL (port 9543)
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['warehouse-service:5432']
+    scrape_interval: 60s
+
+  # Configuration pour Redis (port 9637)
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-cache:6379']
+    scrape_interval: 30s
+
+  # Configuration pour Nginx
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    scrape_interval: 30s
+
+  # Configuration pour Grafana (port 9300)
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    scrape_interval: 30s
+
+# Configuration des alertes
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Configuration des règles d'alerte pour le serveur
+rule_files:
+  - "server_alerts.yml"
+
+# Configuration de stockage pour le serveur
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 10GB
