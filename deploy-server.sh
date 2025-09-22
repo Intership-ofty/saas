@@ -84,7 +84,7 @@ check_prerequisites() {
     
     # Vérifier les ports disponibles
     print_message "Vérification des ports disponibles..."
-    PORTS=(80 10000 10001 10002 10003 10004 10080 10090 10300 10543 10637)
+    PORTS=(80 10000 10001 10002 10003 10004 10080 10090 10300 10543 10637 10900 10901)
     for port in "${PORTS[@]}"; do
         # Essayer plusieurs méthodes pour vérifier les ports
         if command -v ss &> /dev/null; then
@@ -166,6 +166,10 @@ show_access_urls() {
     echo -e "${BLUE}💾 Base de Données:${NC}"
     echo "  PostgreSQL:    $server_ip:10543"
     echo "  Redis:         $server_ip:10637"
+    echo ""
+    echo -e "${BLUE}📦 Stockage Objet:${NC}"
+    echo "  MinIO API:     $server_ip:10900"
+    echo "  MinIO Console: $server_ip:10901 (minioadmin/minioadmin123)"
     echo ""
     echo -e "${BLUE}ℹ️  Information Serveur:${NC}"
     echo "  Page d'info:   http://$server_ip/info"
