@@ -181,6 +181,10 @@ deploy() {
     print_message "Arrêt des services existants..."
     docker-compose -f $COMPOSE_FILE down 2>/dev/null || true
     
+    # Nettoyer les réseaux orphelins qui pourraient causer des conflits
+    print_message "Nettoyage des réseaux Docker..."
+    docker network prune -f 2>/dev/null || true
+    
     # Construire les images
     print_message "Construction des images Docker..."
     docker-compose -f $COMPOSE_FILE build --no-cache
