@@ -18,12 +18,10 @@ alembic==1.13.1
 # Utilitaires
 python-multipart==0.0.6
 httpx==0.25.2
-pydantic==2.5.0
 
 # Tests
 pytest==7.4.3
 pytest-asyncio==0.21.1
-httpx==0.25.2
 
 # Logging et monitoring
 structlog==23.2.0

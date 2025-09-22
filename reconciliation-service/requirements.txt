@@ -1,32 +1,35 @@
 # FastAPI et dépendances web
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+fastapi>=0.100.0,<0.110.0
+uvicorn[standard]>=0.20.0,<0.30.0
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0,<3.0.0
 
-# Zingg et matching
-zingg==0.3.4
-pyspark==3.5.0
-pandas==2.1.4
-numpy==1.25.2
+# Zingg et matching (versions compatibles)
+# Utiliser des versions qui partagent la même version de py4j
+pyspark>=3.3.0,<3.4.0
+pandas>=1.5.0,<3.0.0
+numpy>=1.20.0,<2.0.0
 
 # Machine Learning pour matching
-scikit-learn==1.3.2
-fuzzywuzzy==0.18.0
-python-Levenshtein==0.23.0
+scikit-learn>=1.0.0,<2.0.0
+fuzzywuzzy>=0.18.0,<1.0.0
+python-Levenshtein>=0.20.0,<1.0.0
 
 # Base de données
-psycopg2-binary==2.9.9
-sqlalchemy==2.0.23
+psycopg2-binary>=2.9.0,<3.0.0
+sqlalchemy>=2.0.0,<3.0.0
 
 # Utilitaires
-httpx==0.25.2
-python-multipart==0.0.6
+httpx>=0.20.0,<1.0.0
+python-multipart>=0.0.5,<1.0.0
 
 # Tests
-pytest==7.4.3
-pytest-asyncio==0.21.1
+pytest>=7.0.0,<8.0.0
+pytest-asyncio>=0.20.0,<1.0.0
 
 # Logging et monitoring
-structlog==23.2.0
-prometheus-client==0.19.0
+structlog>=20.0.0,<25.0.0
+prometheus-client>=0.15.0,<1.0.0
+
+# Alternative plus simple: utiliser uniquement PySpark sans Zingg pour le moment
+# Si Zingg est absolument nécessaire, nous pouvons l'installer séparément ou utiliser une version différente
