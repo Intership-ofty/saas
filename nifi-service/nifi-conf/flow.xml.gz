@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Configuration de flux NiFi pour l'ingestion de données SaaS
+Ce fichier définit les processeurs pour l'ingestion depuis différentes sources
+-->
+<flowController>
+    <processGroup id="root">
+        <id>root</id>
+        <name>NiFi Flow</name>
+        <position x="0" y="0"/>
+        
+        <!-- Processeur pour l'ingestion de fichiers CSV -->
+        <processor id="csv-ingestion">
+            <id>csv-ingestion</id>
+            <name>CSV File Ingestion</name>
+            <type>org.apache.nifi.processors.standard.GetFile</type>
+            <position x="100" y="100"/>
+            <config>
+                <property name="Input Directory">/data/input/csv</property>
+                <property name="File Filter">.*\.csv$</property>
+                <property name="Keep Source File">true</property>
+            </config>
+        </processor>
+        
+        <!-- Processeur pour l'ingestion depuis API REST -->
+        <processor id="api-ingestion">
+            <id>api-ingestion</id>
+            <name>REST API Ingestion</name>
+            <type>org.apache.nifi.processors.standard.InvokeHTTP</type>
+            <position x="100" y="200"/>
+            <config>
+                <property name="HTTP Method">GET</property>
+                <property name="Remote URL">http://api-dashboard-service:8000/api/data</property>
+                <property name="Connection Timeout">30 sec</property>
+            </config>
+        </processor>
+        
+        <!-- Processeur pour l'ingestion depuis base de données -->
+        <processor id="db-ingestion">
+            <id>db-ingestion</id>
+            <name>Database Ingestion</name>
+            <type>org.apache.nifi.processors.standard.ExecuteSQL</type>
+            <position x="100" y="300"/>
+            <config>
+                <property name="Database Connection URL">jdbc:postgresql://warehouse-service:5432/data_warehouse</property>
+                <property name="SQL select query">SELECT * FROM raw_data WHERE processed = false</property>
+            </config>
+        </processor>
+        
+        <!-- Routeur vers les microservices -->
+        <processor id="route-to-services">
+            <id>route-to-services</id>
+            <name>Route to Microservices</name>
+            <type>org.apache.nifi.processors.standard.RouteOnAttribute</type>
+            <position x="300" y="200"/>
+            <config>
+                <property name="Routing Strategy">Route to Property name</property>
+            </config>
+        </processor>
+        
+        <!-- Envoi vers service dbt -->
+        <processor id="send-to-dbt">
+            <id>send-to-dbt</id>
+            <name>Send to DBT Service</name>
+            <type>org.apache.nifi.processors.standard.InvokeHTTP</type>
+            <position x="500" y="100"/>
+            <config>
+                <property name="HTTP Method">POST</property>
+                <property name="Remote URL">http://dbt-service:8001/transform</property>
+                <property name="Content-Type">application/json</property>
+            </config>
+        </processor>
+        
+        <!-- Envoi vers service de réconciliation -->
+        <processor id="send-to-reconciliation">
+            <id>send-to-reconciliation</id>
+            <name>Send to Reconciliation Service</name>
+            <type>org.apache.nifi.processors.standard.InvokeHTTP</type>
+            <position x="500" y="200"/>
+            <config>
+                <property name="HTTP Method">POST</property>
+                <property name="Remote URL">http://reconciliation-service:8002/reconcile</property>
+                <property name="Content-Type">application/json</property>
+            </config>
+        </processor>
+        
+        <!-- Envoi vers service de contrôle qualité -->
+        <processor id="send-to-quality">
+            <id>send-to-quality</id>
+            <name>Send to Quality Control Service</name>
+            <type>org.apache.nifi.processors.standard.InvokeHTTP</type>
+            <position x="500" y="300"/>
+            <config>
+                <property name="HTTP Method">POST</property>
+                <property name="Remote URL">http://quality-control-service:8003/check</property>
+                <property name="Content-Type">application/json</property>
+            </config>
+        </processor>
+        
+        <!-- Connexions entre processeurs -->
+        <connection id="csv-to-router">
+            <source id="csv-ingestion" relationship="success"/>
+            <destination id="route-to-services"/>
+        </connection>
+        
+        <connection id="api-to-router">
+            <source id="api-ingestion" relationship="success"/>
+            <destination id="route-to-services"/>
+        </connection>
+        
+        <connection id="db-to-router">
+            <source id="db-ingestion" relationship="success"/>
+            <destination id="route-to-services"/>
+        </connection>
+        
+        <connection id="router-to-dbt">
+            <source id="route-to-services" relationship="dbt"/>
+            <destination id="send-to-dbt"/>
+        </connection>
+        
+        <connection id="router-to-reconciliation">
+            <source id="route-to-services" relationship="reconciliation"/>
+            <destination id="send-to-reconciliation"/>
+        </connection>
+        
+        <connection id="router-to-quality">
+            <source id="route-to-services" relationship="quality"/>
+            <destination id="send-to-quality"/>
+        </connection>
+    </processGroup>
+</flowController>

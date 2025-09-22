@@ -176,8 +176,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # NiFi specific
-nifi-service/conf/flow.xml.gz
-nifi-service/conf/nifi.properties
+#nifi-service/conf/flow.xml.gz
+#nifi-service/conf/nifi.properties
 
 # Data files
 data/
@@ -212,7 +212,7 @@ redis-data/
 postgres-data/
 
 # NiFi data
-nifi-*/
+#nifi-*/
 
 # Zingg data
 zingg-*/

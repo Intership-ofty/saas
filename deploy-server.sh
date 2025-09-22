@@ -61,16 +61,24 @@ check_prerequisites() {
     fi
     
     # Vérifier que les répertoires des services existent
+    print_message "Vérification de la structure du projet..."
+    print_message "Répertoire actuel: $(pwd)"
+    print_message "Contenu du répertoire:"
+    ls -la
+    
     REQUIRED_DIRS=("api-dashboard-service" "nifi-service" "dbt-service" "reconciliation-service" "quality-control-service" "rca-service" "warehouse-service")
     for dir in "${REQUIRED_DIRS[@]}"; do
         if [ ! -d "$dir" ]; then
             print_error "Répertoire de service manquant: $dir"
+            print_error "Contenu disponible: $(ls -1 | tr '\n' ' ')"
             exit 1
         fi
         if [ ! -f "$dir/Dockerfile" ]; then
             print_error "Dockerfile manquant dans: $dir"
+            print_error "Contenu de $dir: $(ls -1 $dir/ | tr '\n' ' ')"
             exit 1
         fi
+        print_message "✓ $dir vérifié"
     done
     print_message "Structure du projet vérifiée ✓"
     
